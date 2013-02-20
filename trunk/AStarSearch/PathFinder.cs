@@ -8,9 +8,9 @@ namespace AStarSearch
 {
     class PathFinder
     {
-        public Structs.Tile[] map;
+        public Structs.Tile[] map; // You can set the map externally using the function below
 
-        public Structs.Tile[] Map
+        public Structs.Tile[] Map // The map should be an array of type Structs.Tile. All data should be filled in except distanceLeft and parentID
         {
             set{ map = value; }
             get{ return map; }
@@ -45,6 +45,7 @@ namespace AStarSearch
 
         public List<Structs.Tile> findPath(int startx, int starty, int goalx, int goaly, Structs.Tile[] map)
         {
+            bool? pathFound = null;
             List<Structs.Tile> closedList = new List<Structs.Tile>();
             List<Structs.Tile> openList = new List<Structs.Tile>();
             List<Structs.Tile> pathList = new List<Structs.Tile>();
@@ -62,19 +63,28 @@ namespace AStarSearch
                 }
                 i++;
             }
-
-            foreach (Structs.Tile tile in map)
+            while (pathFound == null)
             {
-                foreach (Structs.Tile tile1 in getSurroundingTiles(Current))
+                foreach (Structs.Tile tile in map)
                 {
-                    if (tile1.x == tile.x && tile1.y == tile.y)
+                    foreach (Structs.Tile tile1 in getSurroundingTiles(Current))
                     {
-                        Structs.Tile curTile = tile1;
-                        curTile.parentid = Current.id;
-                        curTile.distanceLeft = (Math.Abs(tile.x - goalx) + Math.Abs(tile.y - goaly));
-                        openList.Add(curTile);
+                        if (tile1.x == tile.x && tile1.y == tile.y)
+                        {
+                            Structs.Tile curTile = tile1;
+                            curTile.parentid = Current.id;
+                            curTile.distanceLeft = (Math.Abs(tile.x - goalx) + Math.Abs(tile.y - goaly));
+                            if (curTile.distanceLeft == 0)
+                            {
+                                pathFound = true;
+                            }
+                            openList.Add(curTile);
+                        }
                     }
                 }
+                Current = openList.OrderByAscending(t => t.distanceLeft).First();
+                
+
             }
             return pathList;
         }
